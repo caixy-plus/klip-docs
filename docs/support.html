@@ -23,6 +23,26 @@
     h2 { font-size: 1.1rem; margin-top: 1.75rem; }
     .meta { color: #86868b; font-size: 0.9rem; margin-bottom: 2rem; }
     a { color: #0066cc; }
+    .mail-link {
+      color: #0066cc;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .mail-button {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      background: #0066cc;
+      color: #fff !important;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .mail-button:hover { background: #0055b3; }
+    @media (prefers-color-scheme: dark) {
+      .mail-button { background: #0a84ff; }
+      .mail-button:hover { background: #0077ed; }
+    }
     code { font-size: 0.9em; }
     footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d2d2d7; font-size: 0.9rem; color: #86868b; }
     @media (prefers-color-scheme: dark) {
@@ -36,7 +56,10 @@
   <p class="meta">macOS 菜单栏剪贴板历史管理器 · 完全离线 · 零权限</p>
 
   <h2>联系我们</h2>
-  <p>如有问题或反馈，请发送邮件至：<a href="mailto:caixinyun2015@icloud.com">caixinyun2015@icloud.com</a></p>
+  <p>如有问题或反馈，请发送邮件至：
+    <a class="mail-link" href="mailto:caixinyun2015@icloud.com?subject=Klip%20%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81">caixinyun2015@icloud.com</a>
+  </p>
+  <p><a class="mail-button" href="mailto:caixinyun2015@icloud.com?subject=Klip%20%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81">发送邮件</a></p>
   <p>我们会在 2 个工作日内回复。</p>
 
   <h2>系统要求</h2>
