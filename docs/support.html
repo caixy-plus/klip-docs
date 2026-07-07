@@ -23,11 +23,6 @@
     h2 { font-size: 1.1rem; margin-top: 1.75rem; }
     .meta { color: #86868b; font-size: 0.9rem; margin-bottom: 2rem; }
     a { color: #0066cc; }
-    .mail-link {
-      color: #0066cc;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
     .mail-button {
       display: inline-block;
       margin-top: 0.5rem;
@@ -39,9 +34,42 @@
       font-weight: 500;
     }
     .mail-button:hover { background: #0055b3; }
+    .copy-button {
+      display: inline-block;
+      margin-left: 0.5rem;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #d2d2d7;
+      background: transparent;
+      color: inherit !important;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: inherit;
+      font-family: inherit;
+    }
+    .copy-button:hover { background: rgba(0, 0, 0, 0.04); }
+    .contact-actions { margin: 0.75rem 0; }
+    .toast {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      background: #f2f2f7;
+      color: #1d1d1f;
+      font-size: 0.9rem;
+    }
+    .hint {
+      font-size: 0.85rem;
+      color: #86868b;
+      margin-top: 0.5rem;
+    }
     @media (prefers-color-scheme: dark) {
       .mail-button { background: #0a84ff; }
       .mail-button:hover { background: #0077ed; }
+      .copy-button { border-color: #3a3a3c; }
+      .copy-button:hover { background: rgba(255, 255, 255, 0.06); }
+      .toast { background: #2c2c2e; color: #f5f5f7; }
     }
     code { font-size: 0.9em; }
     footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d2d2d7; font-size: 0.9rem; color: #86868b; }
@@ -56,10 +84,13 @@
   <p class="meta">macOS 菜单栏剪贴板历史管理器 · 完全离线 · 零权限</p>
 
   <h2>联系我们</h2>
-  <p>如有问题或反馈，请发送邮件至：
-    <a class="mail-link" href="mailto:caixinyun2015@icloud.com?subject=Klip%20%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81">caixinyun2015@icloud.com</a>
-  </p>
-  <p><a class="mail-button" href="mailto:caixinyun2015@icloud.com?subject=Klip%20%E6%8A%80%E6%9C%AF%E6%94%AF%E6%8C%81">发送邮件</a></p>
+  <p>如有问题或反馈，请发送邮件至 <strong id="support-email">caixinyun2015@icloud.com</strong></p>
+  <div class="contact-actions">
+    <a class="mail-button" id="mail-button" href="#">发送邮件</a>
+    <button class="copy-button" id="copy-button" type="button">复制邮箱</button>
+  </div>
+  <p class="hint">点击「发送邮件」将唤起系统默认邮件应用。若未自动打开，请用 Safari 打开本页，或复制邮箱后手动发送。</p>
+  <p id="toast" class="toast" role="status" aria-live="polite"></p>
   <p>我们会在 2 个工作日内回复。</p>
 
   <h2>系统要求</h2>
@@ -91,5 +122,82 @@
   <footer>
     <a href="index.html">Klip</a> · <a href="privacy.html">隐私政策</a>
   </footer>
+  <script>
+    (function () {
+      var email = "caixinyun2015@icloud.com";
+      var subject = "Klip 技术支持";
+      var mailto = "mailto:" + email + "?subject=" + encodeURIComponent(subject);
+      var mailButton = document.getElementById("mail-button");
+      var copyButton = document.getElementById("copy-button");
+      var toast = document.getElementById("toast");
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.style.display = "block";
+        window.setTimeout(function () {
+          toast.style.display = "none";
+        }, 3000);
+      }
+
+      function openMailClient(event) {
+        if (event) event.preventDefault();
+
+        // 1) 标准 mailto 导航
+        window.location.href = mailto;
+
+        // 2) 程序化点击 <a>，部分内嵌浏览器需要这种方式
+        window.setTimeout(function () {
+          var link = document.createElement("a");
+          link.href = mailto;
+          link.style.display = "none";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, 0);
+
+        // 3) iframe 兜底（旧版 WebKit / 部分预览器）
+        window.setTimeout(function () {
+          var frame = document.createElement("iframe");
+          frame.style.display = "none";
+          frame.src = mailto;
+          document.body.appendChild(frame);
+          window.setTimeout(function () {
+            document.body.removeChild(frame);
+          }, 2000);
+        }, 50);
+      }
+
+      function copyEmail() {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(email).then(function () {
+            showToast("邮箱已复制：" + email);
+          }).catch(fallbackCopy);
+        } else {
+          fallbackCopy();
+        }
+      }
+
+      function fallbackCopy() {
+        var input = document.createElement("textarea");
+        input.value = email;
+        input.setAttribute("readonly", "");
+        input.style.position = "absolute";
+        input.style.left = "-9999px";
+        document.body.appendChild(input);
+        input.select();
+        try {
+          document.execCommand("copy");
+          showToast("邮箱已复制：" + email);
+        } catch (e) {
+          showToast("请手动复制邮箱：" + email);
+        }
+        document.body.removeChild(input);
+      }
+
+      mailButton.href = mailto;
+      mailButton.addEventListener("click", openMailClient);
+      copyButton.addEventListener("click", copyEmail);
+    })();
+  </script>
 </body>
 </html>
